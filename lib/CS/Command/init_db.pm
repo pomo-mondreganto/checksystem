@@ -14,7 +14,9 @@ sub run {
 
   # Services
   for my $service (@{$app->config->{services}}) {
-    my ($n, $vulns) = $app->model('checker')->vulns($service);
+    my $job_id = $app->minion->enqueue(vulns => [$service] => {queue => 'vulns'});
+    $app->minion->perform_jobs({queues => ['vulns']});
+    my ($n, $vulns) = @{$app->minion->job($job_id)->info->{result}{vulns}};
     my $service_id =
       $db->query('insert into services (name, vulns) values (?, ?) returning id', $service->{name}, $vulns)
       ->hash->{id};

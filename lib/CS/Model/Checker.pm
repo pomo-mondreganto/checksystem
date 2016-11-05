@@ -15,16 +15,16 @@ has status2name => sub {
 };
 
 sub vulns {
-  my ($self, $service) = @_;
+  my ($self, $job, $service) = @_;
 
   my $info = $self->_run([$service->{path}, 'info'], $service->{timeout});
-  return (1, '1') unless $info->{exit_code} == 101;
+  return $job->finish({vulns => [1, '1']}) unless $info->{exit_code} == 101;
 
   $info->{stdout} =~ /^vulns:(.*)$/m;
   my $vulns = trim($1 // '');
-  return (1, '1') unless $vulns =~ /^[0-9:]+$/;
+  return $job->finish({vulns => [1, '1']}) unless $vulns =~ /^[0-9:]+$/;
 
-  return (0 + split(/:/, $vulns), $vulns);
+  $job->finish({vulns => [0 + split(/:/, $vulns), $vulns]});
 }
 
 sub check {

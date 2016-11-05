@@ -29,6 +29,7 @@ sub startup {
 
   # Tasks
   $app->minion->add_task(check => sub { $_[0]->app->model('checker')->check(@_) });
+  $app->minion->add_task(vulns => sub { $_[0]->app->model('checker')->vulns(@_) });
   $app->minion->add_task(
     scoreboard => sub {
       my $app = shift->app;

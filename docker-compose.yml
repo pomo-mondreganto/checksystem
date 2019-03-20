@@ -12,8 +12,6 @@ services:
       dockerfile: ./docker_config/dockerfiles/postgres.Dockerfile
     volumes:
       - ./docker_volumes/db/postgresql:/var/lib/postgresql
-    ports: 
-      - "5432:5432"
     restart: on-failure
     env_file:
       - ./docker_config/environment.env

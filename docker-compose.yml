@@ -1,0 +1,104 @@
+version: "3"
+
+networks:
+  lan_access:
+    driver: bridge
+
+
+services:
+  postgres:
+    build: 
+      context: .
+      dockerfile: ./docker_config/dockerfiles/postgres.Dockerfile
+    volumes:
+      - ./docker_volumes/db/postgresql:/var/lib/postgresql
+    ports: 
+      - "5432:5432"
+    restart: on-failure
+    env_file:
+      - ./docker_config/environment.env
+
+  initializer:
+    build:
+      context: .
+      dockerfile: ./docker_config/dockerfiles/initializer.Dockerfile
+    volumes:
+      - ./docker_volumes/shared:/shared
+    depends_on: 
+      - postgres
+    restart: on-failure
+    env_file:
+      - ./docker_config/environment.env
+
+  manager:
+    build:
+      context: .
+      dockerfile: ./docker_config/dockerfiles/manager.Dockerfile
+    volumes:
+      - ./docker_volumes/shared:/shared
+    depends_on: 
+      - initializer
+    restart: on-failure
+    env_file:
+      - ./docker_config/environment.env
+
+  flags:
+    build:
+      context: .
+      dockerfile: ./docker_config/dockerfiles/flags.Dockerfile
+    volumes:
+      - ./docker_volumes/shared:/shared
+    ports: 
+      - "31337:31337"
+    depends_on: 
+      - manager
+    restart: on-failure
+    env_file:
+      - ./docker_config/environment.env
+    networks:
+      - lan_access
+      - default
+
+  minion_1:
+    build:
+      context: .
+      dockerfile: ./docker_config/dockerfiles/minion_1.Dockerfile
+    volumes:
+      - ./docker_volumes/shared:/shared
+    depends_on: 
+      - flags
+    restart: on-failure
+    env_file:
+      - ./docker_config/environment.env
+    networks:
+      - default
+      - lan_access
+
+  minion_2:
+    build:
+      context: .
+      dockerfile: ./docker_config/dockerfiles/minion_2.Dockerfile
+    volumes:
+      - ./docker_volumes/shared:/shared
+    depends_on: 
+      - minion_1
+    restart: on-failure
+    env_file:
+      - ./docker_config/environment.env
+    networks:
+      - default
+      - lan_access
+
+  hypnotoad:
+    build:
+      context: .
+      dockerfile: ./docker_config/dockerfiles/hypnotoad.Dockerfile
+    volumes:
+      - ./docker_volumes/shared:/shared
+    ports:
+      - "8080:8080"
+    depends_on: 
+      - minion_2
+    restart: on-failure
+    env_file:
+      - ./docker_config/environment.env

@@ -3,3 +3,10 @@ c_s.conf
 *.pid
 *.bak
 *.swp
+*.env
+.DS_Store
+
+docker_volumes/db/*
+docker_volumes/shared/*
+
+!docker_volumes/*/.gitkeep

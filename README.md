@@ -1,26 +1,15 @@
 # checksystem [![Build Status](https://travis-ci.org/HackerDom/checksystem.svg?branch=master)](https://travis-ci.org/HackerDom/checksystem)
 Checksystem for attack-defense CTF
 
-# install
-```bash
-root# apt-get install postgresql-9.5 libssl-dev libpq-dev cpanminus build-essenial
-root# cpanm --installdeps .
+Modified to run in docker with docker-compose in a couple of minutes. 
+
+To start, edit `c_s.conf` (see `cs.conf.example` for an example) and run:
+
+```
+docker-compose build
+docker-compose up -d
 ```
 
-# configure
-```bash
-psql$ createuser -P cs
-psql$ createdb -O cs cs
-ctf$ cp cs.conf.example c_s.conf
-ctf$ $EDITOR c_s.conf
-ctf$ script/cs init_db
-```
+Checksystem should be up & running. If it's not, open an issue describing your problem.
 
-# run simultaneously
-```bash
-ctf$ script/cs manager
-ctf$ script/cs flags
-ctf$ script/cs minion worker -j 3
-ctf$ script/cs minion worker -q checker -j 48
-ctf$ hypnotoad script/cs
-```
+For more information, see the [base repo](https://github.com/HackerDom/checksystem).
